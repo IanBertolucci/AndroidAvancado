@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,7 +17,7 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    Button btnSimples;
+    Button btnSimples, btnCancelar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +27,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnSimples = (Button) findViewById(R.id.btnSimples);
         btnSimples.setOnClickListener(this);
 
+        btnCancelar = (Button) findViewById(R.id.btnCancelar);
+        btnCancelar.setOnClickListener(this);
+
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel("1", "canal1", NotificationManager.IMPORTANCE_HIGH);
-            mChannel.enableLights(true);
-            mChannel.setLightColor(Color.RED);
-            mChannel.enableVibration(true);
             notificationManager.createNotificationChannel(mChannel);
         }
 
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.btnSimples:
                 criarNotificacaoSimples();
+                break;
+            case R.id.btnCancelar:
+                cancelarNotificacao(1);
                 break;
         }
     }
@@ -61,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         notificationCompat.setContentTitle(titulo);
         notificationCompat.setContentText(texto);
         notificationCompat.setContentIntent(p);
+        notificationCompat.setDefaults(Notification.DEFAULT_ALL);
+        notificationCompat.setVibrate(new long[]{1000,1000,1000,1000,1000});
+        notificationCompat.setAutoCancel(true);
 
         NotificationManagerCompat nm = NotificationManagerCompat.from(this);
         nm.notify(id, notificationCompat.build());
@@ -73,5 +80,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         PendingIntent p = stackBuilder.getPendingIntent(id, PendingIntent.FLAG_UPDATE_CURRENT);
         return p;
+    }
+
+    public void cancelarNotificacao(int id){
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        nm.cancel(id);
     }
 }
