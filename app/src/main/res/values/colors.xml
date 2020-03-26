@@ -6,4 +6,5 @@
     <color name="colorWindowBackground">#dcdcdc</color>
     <color name="navigationBar">#464646</color>
     <color name="colorTextPrimary">#fff</color>
+    <color name="colorToolbarSubtitulo">#8BC34A</color>
 </resources>
