@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "506594980652",
+    "firebase_url": "https://android-avancado-600e9.firebaseio.com",
+    "project_id": "android-avancado-600e9",
+    "storage_bucket": "android-avancado-600e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:506594980652:android:9a8a35d1a9aadaa441b289",
+        "android_client_info": {
+          "package_name": "com.example.treinamentoandroidavancado"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "506594980652-kt78b4mff1n9pa675f3hkdab3v199pso.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnb1H6dEPEMtsxybtnqPLO301Zz9D0r0I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "506594980652-kt78b4mff1n9pa675f3hkdab3v199pso.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
