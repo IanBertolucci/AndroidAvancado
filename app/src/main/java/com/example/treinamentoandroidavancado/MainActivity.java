@@ -3,6 +3,10 @@ package com.example.treinamentoandroidavancado;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -11,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     TextView tarefa;
@@ -28,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
+    private boolean isOnline(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()){
+            return true;
+        } else return false;
+    }
+
     protected void atualizarView(String msg){
         tarefa.append(msg + "\n");
     }
@@ -41,10 +54,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.iniciarTarefa){
-            MyTask task = new MyTask();
-            task.execute("task 1", "task 2", "task 3", "task 4");
+            if (isOnline()){
+                MyTask myTask = new MyTask();
+                buscarDados(myTask, "http://10.0.2.2:3000/api/produtos/json");
+            }
+            else {
+                Toast.makeText(this, "rede não conectada", Toast.LENGTH_LONG).show();
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void buscarDados(MyTask task, String mUrl) {
+        task.execute(mUrl);
     }
 
     private class MyTask extends AsyncTask<String, String, String>{
@@ -57,15 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-            for (int i = 0; i < strings.length; i++){
-                try {
-                    publishProgress("Trabalhando com: " + strings[i]);
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return "Tarefa concluída.";
+
+            String conteudo = HttpManager.getDados(strings[0]);
+            return conteudo;
+
         }
 
         @Override
