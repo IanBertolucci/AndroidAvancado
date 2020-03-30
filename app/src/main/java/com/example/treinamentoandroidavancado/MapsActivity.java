@@ -1,18 +1,29 @@
 package com.example.treinamentoandroidavancado;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,6 +36,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
     LocationManager locationManager;
+
+    Handler handler;
+    int cont = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +55,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        handler = new Handler();
     }
 
     @Override
@@ -54,6 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStop();
         if (googleApiClient != null && googleApiClient.isConnected()) {
             googleApiClient.disconnect();
+            handler.removeCallbacksAndMessages(null);
         }
     }
 
@@ -78,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        localizacao();
+        verificarStatusGPS();
     }
 
     @Override
@@ -90,13 +107,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         } else {
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            final Location location = (Location) locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null){
+                cont = 0;
+                atualizarMapa(new LatLng(location.getLatitude(), location.getLongitude()));
+            } else if(cont < 10){
+                cont++;
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        localizacao();
+                    }
+                }, 2000);
+            }
         }
+    }
+
+    private void verificarStatusGPS(){
+        final LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder locatSettingsRequest = new LocationSettingsRequest.Builder();
+        locatSettingsRequest.setAlwaysShow(true);
+        locatSettingsRequest.addLocationRequest(locationRequest);
+
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, locatSettingsRequest.build());
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+                final Status status = locationSettingsResult.getStatus();
+                switch (status.getStatusCode()){
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        localizacao();
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        try {
+                            status.startResolutionForResult(MapsActivity.this, 2);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        Log.i("MAPS-APP", "Não foi possível obter a localização");
+                        break;
+                }
+            }
+        });
     }
 
     private void atualizarMapa(LatLng local){
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(local, 17.0f));
         mMap.clear();
         mMap.addMarker(new MarkerOptions().position(local).title("Local atual"));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 2){
+            if (resultCode == RESULT_OK){
+                cont = 0;
+                handler.removeCallbacksAndMessages(null);
+                localizacao();
+            }
+
+        }
     }
 }
