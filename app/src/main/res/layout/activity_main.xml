@@ -38,4 +38,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Logout Google" />
+    <Button
+            android:id="@+id/btnToken"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Logout Google" />
 </LinearLayout>

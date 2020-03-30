@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TreinamentoAndroidAvancado</string>
+    <string name="msg_token_fmt" />
 </resources>
