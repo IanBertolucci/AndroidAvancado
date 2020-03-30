@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Map;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
@@ -23,7 +26,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (remoteMessage.getNotification() != null) {
             Log.i("notificação", String.valueOf(remoteMessage.getNotification().getBody()));
-            enviarNotificacao(remoteMessage.getNotification().getBody());
+            enviarNotificacao(remoteMessage.getNotification().getBody(), remoteMessage.getData());
         }
 
         if (remoteMessage.getData().size() != 0) {
@@ -31,8 +34,17 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void enviarNotificacao(String msg){
-        Intent intent = new Intent(this, PrincipalActivity.class);
+    private void enviarNotificacao(String msg, Map<String, String> dados){
+        Intent intent = new Intent(this, FcmActivity.class);
+
+        Bundle bundle = new Bundle();
+        for (String key : dados.keySet()){
+            String valor = dados.get(key).toString();
+            bundle.putString(key, valor);
+        }
+
+        intent.putExtras(bundle);
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
