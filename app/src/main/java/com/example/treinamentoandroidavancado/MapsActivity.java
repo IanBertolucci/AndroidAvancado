@@ -24,6 +24,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,11 +56,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
                 .build();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         handler = new Handler();
+
+        PlaceAutocompleteFragment placeAutocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        placeAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                atualizarMapa(place.getLatLng());
+            }
+
+            @Override
+            public void onError(Status status) {
+                assert status.getStatusMessage() != null;
+                Log.e("mapsapp", status.getStatusMessage());
+            }
+        });
     }
 
     @Override
