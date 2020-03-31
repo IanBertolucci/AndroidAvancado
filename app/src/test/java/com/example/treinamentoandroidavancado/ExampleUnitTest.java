@@ -14,4 +14,16 @@ public class ExampleUnitTest {
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
+
+    @Test
+    public void calculadora_somar(){
+        Calculadora calculadora = new Calculadora(5, 10);
+        assertEquals(15, calculadora.somar());
+    }
+
+    @Test
+    public void calculadora_multiplicar(){
+        Calculadora calculadora = new Calculadora(5, 10);
+        assertEquals(50, calculadora.multiplicar());
+    }
 }

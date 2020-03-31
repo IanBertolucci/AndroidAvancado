@@ -1,10 +1,14 @@
 package com.example.treinamentoandroidavancado;
 
+import android.app.Activity;
 import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.ActivityTestRule;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -17,6 +21,33 @@ import static org.junit.Assert.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
+    @Rule
+    public ActivityTestRule<MainActivity> mainActivityActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    MainActivity mainActivity;
+    Context context;
+
+    @Before
+    public void setup() throws Exception{
+        mainActivity = mainActivityActivityTestRule.getActivity();
+        context = mainActivity.getApplicationContext();
+    }
+
+    @Test
+    public void botaoSomar() throws Exception{
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mainActivity.edtNum1.setText("10");
+                mainActivity.edtNum2.setText("15");
+
+                mainActivity.onClick(mainActivity.btnCalcular);
+            }
+        });
+
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        assertEquals("25", mainActivity.txtResultado.getText());
+    }
+
     @Test
     public void useAppContext() {
         // Context of the app under test.
