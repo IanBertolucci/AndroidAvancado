@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">TreinamentoAndroidAvancado</string>
+    <string name="app_name">Agenda</string>
+    <string name="titulo1">Agenda</string>
+    <string name="labelInserir">Novo</string>
+    <string name="titulo3">Dados do contato:</string>
+    <string name="labelNome">Nome:</string>
+    <string name="labelTelefone">Telefone:</string>
+    <string name="labelFoto">Foto:</string>
+    <string name="botaoSalvar">Salvar</string>
+    <string name="labelId">Id:</string>
+    <string name="botaoAlterar">Alterar</string>
+    <string name="botaoExcluir">Excluir</string>
+    <string name="botaoImagem">Selecione a Imagem</string>
 </resources>
